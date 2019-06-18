@@ -137,7 +137,7 @@ for table in allTables:
         td_data_strip = unidecode(td_data.rstrip('\n'))
         td_data_strip2 = td_data_strip.replace("'", "")
         td_data_strip3 = td_data_strip2.replace("[", "")
-        td_data_fix = td_data_strip3.replace("]", "")
+        td_data_fix = td_data_strip3.replace("]", "") 
         bdata.write("tID"+rowIDX+',')
         if "[]" not in td_data_fix:
             bdata.write(td_data_fix+','+' '+'\n'+' ')
