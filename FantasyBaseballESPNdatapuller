@@ -1,0 +1,240 @@
+import urllib.request
+from bs4 import BeautifulSoup
+from selenium import webdriver
+import numpy as np
+import pandas as pd
+import time
+import datetime
+from unidecode import unidecode
+
+URL15D=("http://fantasy.espn.com/baseball/team?leagueId=30097818&teamId=2&seasonId=2019&statSplit=last15")
+URL30D=("http://fantasy.espn.com/baseball/team?leagueId=30097818&teamId=2&seasonId=2019&statSplit=last30")
+URLSEAS=("http://fantasy.espn.com/baseball/team?leagueId=30097818&teamId=2&statSplit=currSeason")
+URLRES=("http://fantasy.espn.com/baseball/team?leagueId=30097818&teamId=2&seasonId=2019&statSplit=lastSeason&view=research")
+URLSTD=("http://fantasy.espn.com/baseball/league/standings?leagueId=30097818")
+URLSCR=("http://fantasy.espn.com/baseball/league/scoreboard?leagueId=30097818")
+URLW15=("http://fantasy.espn.com/baseball/watchlist?leagueId=30097818&statSplit=last15")
+URLW30=("http://fantasy.espn.com/baseball/watchlist?leagueId=30097818&statSplit=last30")
+URLWSe=("http://fantasy.espn.com/baseball/watchlist?leagueId=30097818&statSplit=currSeason")
+URLMLB=("http://www.espn.com/mlb/standings")
+URLBAT=("https://www.baseball-reference.com/leagues/MLB/2019-standard-batting.shtml")
+now=datetime.datetime.now()
+
+driver = webdriver.Chrome()
+driver.get (URL15D)
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight);var lenOfPage=document.body.scrollHieght;return lenOfPage;")
+time.sleep(2)
+
+adata = open ('test.csv','w')
+adata.write('TEAM STATS'+','+','+"UPDATED: "+now.strftime("%m-%d %H:%M")+'\n'+'\n'+"15D"+'\n')
+allTables = driver.find_elements_by_class_name('Table2__tbody')
+
+for table in allTables:
+    for row in table.find_elements_by_tag_name('tr'):
+        rowIDX = row.get_attribute("data-idx")
+        tds = row.find_elements_by_tag_name('td')
+        td_data = str([td.text for td in tds])
+        td_data_strip = unidecode(td_data.rstrip('\n'))
+        td_data_strip2 = td_data_strip.replace("'", "")
+        td_data_strip3 = td_data_strip2.replace("[", "")
+        td_data_fix = td_data_strip3.replace("]", "")
+        if (td_data_fix[0] == "P"):
+            adata.write("P"+rowIDX+',')
+        elif (td_data_fix[0].startswith("B")):
+            adata.write("BEN"+rowIDX+',')
+        elif (td_data_fix[0].startswith("I")):
+            adata.write("IL"+rowIDX+',')
+        elif (td_data_fix[0].isdecimal()):
+            adata.write("D"+rowIDX+',')
+        else:
+            adata.write("B"+rowIDX+',')
+        if "[]" not in td_data_fix:
+            adata.write(td_data_fix+','+' '+'\n'+' ')
+            
+driver.get (URL30D)
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight);var lenOfPage=document.body.scrollHieght;return lenOfPage;")
+time.sleep(2)
+adata.write('\n'+"30D"+'\n'+'\n')
+
+allTables = driver.find_elements_by_class_name('Table2__tbody')
+
+for table in allTables:
+    for row in table.find_elements_by_tag_name('tr'):
+        rowIDX = row.get_attribute("data-idx")
+        tds = row.find_elements_by_tag_name('td')
+        td_data = str([td.text for td in tds])
+        td_data_strip = unidecode(td_data.rstrip('\n'))
+        td_data_strip2 = td_data_strip.replace("'", "")
+        td_data_strip3 = td_data_strip2.replace("[", "")
+        td_data_fix = td_data_strip3.replace("]", "")
+        if(td_data_fix[0] == "P"):
+            adata.write("P"+rowIDX+',')
+        else:
+            adata.write("B"+rowIDX+',')
+        if "[]" not in td_data_fix:
+            adata.write(td_data_fix+','+' '+'\n'+' ')
+
+driver.get (URLSEAS)
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight);var lenOfPage=document.body.scrollHieght;return lenOfPage;")
+time.sleep(2)
+adata.write('\n'+"SEAS"+'\n'+'\n')
+
+allTables = driver.find_elements_by_class_name('Table2__tbody')
+
+for table in allTables:
+    for row in table.find_elements_by_tag_name('tr'):
+        rowIDX = row.get_attribute("data-idx")
+        tds = row.find_elements_by_tag_name('td')
+        td_data = str([td.text for td in tds])
+        td_data_strip = unidecode(td_data.rstrip('\n'))
+        td_data_strip2 = td_data_strip.replace("'", "")
+        td_data_strip3 = td_data_strip2.replace("[", "")
+        td_data_fix = td_data_strip3.replace("]", "")
+        if(td_data_fix[0] == "P"):
+            adata.write("P"+rowIDX+',')
+        else:
+            adata.write("B"+rowIDX+',')
+        if "[]" not in td_data_fix:
+            adata.write(td_data_fix+','+' '+'\n'+' ')
+
+driver.get (URLRES)
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight);var lenOfPage=document.body.scrollHieght;return lenOfPage;")
+time.sleep(2)
+adata.write('\n'+"RES"+'\n'+'\n')
+
+allTables = driver.find_elements_by_class_name('Table2__tbody')
+
+for table in allTables:
+    for row in table.find_elements_by_tag_name('tr'):
+        rowIDX = row.get_attribute("data-idx")
+        tds = row.find_elements_by_tag_name('td')
+        td_data = str([td.text for td in tds])
+        td_data_strip = unidecode(td_data.rstrip('\n'))
+        td_data_strip2 = td_data_strip.replace("'", "")
+        td_data_strip3 = td_data_strip2.replace("[", "")
+        td_data_fix = td_data_strip3.replace("]", "")
+        if(td_data_fix[0] == "P"):
+            adata.write("P"+rowIDX+',')
+        else:
+            adata.write("B"+rowIDX+',')
+        if "[]" not in td_data_fix:
+            adata.write(td_data_fix+','+' '+'\n'+' ')
+adata.close()
+
+driver.get (URLSTD)
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight);var lenOfPage=document.body.scrollHieght;return lenOfPage;")
+time.sleep(2)
+
+bdata = open ('test2.csv','w')
+bdata.write('SCORING & STANDINGS'+','+','+"UPDATED: "+now.strftime("%m-%d %H:%M")+'\n'+'\n')
+allTables = driver.find_elements_by_class_name('Table2__tbody')
+
+for table in allTables:
+    for row in table.find_elements_by_tag_name('tr'):
+        rowIDX = row.get_attribute("data-idx")
+        tds = row.find_elements_by_tag_name('td')
+        td_data = str([td.text for td in tds])
+        td_data_strip = unidecode(td_data.rstrip('\n'))
+        td_data_strip2 = td_data_strip.replace("'", "")
+        td_data_strip3 = td_data_strip2.replace("[", "")
+        td_data_fix = td_data_strip3.replace("]", "")
+        bdata.write("tID"+rowIDX+',')
+        if "[]" not in td_data_fix:
+            bdata.write(td_data_fix+','+' '+'\n'+' ')
+bdata.close()
+
+driver.get (URLW15)
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight);var lenOfPage=document.body.scrollHieght;return lenOfPage;")
+time.sleep(2)
+
+cdata = open ('test3.csv','w')
+cdata.write('WATCHLIST STATS'+','+','+"UPDATED: "+now.strftime("%m-%d %H:%M")+'\n'+'\n'+"15D"+'\n')
+allTables = driver.find_elements_by_class_name('Table2__tbody')
+
+for table in allTables:
+    for row in table.find_elements_by_tag_name('tr'):
+        tds = row.find_elements_by_tag_name('td')
+        td_data = str([td.text for td in tds])
+        td_data_strip = unidecode(td_data.rstrip('\n'))
+        td_data_strip2 = td_data_strip.replace("'", "")
+        td_data_strip3 = td_data_strip2.replace("[", "")
+        td_data_fix = td_data_strip3.replace("]", "")
+        if "[]" not in td_data_fix:
+            cdata.write(td_data_fix+','+' '+'\n'+' ')
+
+driver.get (URLW30)
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight);var lenOfPage=document.body.scrollHieght;return lenOfPage;")
+time.sleep(2)
+cdata.write("30D"+'\n')
+
+allTables = driver.find_elements_by_class_name('Table2__tbody')
+
+for table in allTables:
+    for row in table.find_elements_by_tag_name('tr'):
+        tds = row.find_elements_by_tag_name('td')
+        td_data = str([td.text for td in tds])
+        td_data_strip = unidecode(td_data.rstrip('\n'))
+        td_data_strip2 = td_data_strip.replace("'", "")
+        td_data_strip3 = td_data_strip2.replace("[", "")
+        td_data_fix = td_data_strip3.replace("]", "")
+        if "[]" not in td_data_fix:
+            cdata.write(td_data_fix+','+' '+'\n'+' ')
+
+driver.get (URLWSe)
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight);var lenOfPage=document.body.scrollHieght;return lenOfPage;")
+time.sleep(2)
+cdata.write("SEAS"+'\n')
+
+allTables = driver.find_elements_by_class_name('Table2__tbody')
+
+for table in allTables:
+    for row in table.find_elements_by_tag_name('tr'):
+        tds = row.find_elements_by_tag_name('td')
+        td_data = str([td.text for td in tds])
+        td_data_strip = unidecode(td_data.rstrip('\n'))
+        td_data_strip2 = td_data_strip.replace("'", "")
+        td_data_strip3 = td_data_strip2.replace("[", "")
+        td_data_fix = td_data_strip3.replace("]", "")
+        if "[]" not in td_data_fix:
+            cdata.write(td_data_fix+','+' '+'\n'+' ')
+cdata.close()
+
+driver.get (URLMLB)
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight);var lenOfPage=document.body.scrollHieght;return lenOfPage;")
+time.sleep(2)
+
+ddata = open ('test4.csv','w')
+ddata.write('MLB STATS'+','+','+"UPDATED: "+now.strftime("%m-%d %H:%M")+'\n')
+allTables = driver.find_elements_by_class_name('tabs__content')
+
+for table in allTables:
+    for row in table.find_elements_by_tag_name('tr'):
+        tds = row.find_elements_by_tag_name('td')
+        td_data = str([td.text for td in tds])
+        td_data_strip = unidecode(td_data.rstrip('\n'))
+        td_data_strip2 = td_data_strip.replace("'", "")
+        td_data_strip3 = td_data_strip2.replace("[", "")
+        td_data_fix = td_data_strip3.replace("]", "")
+        if "[]" not in td_data_fix:
+            ddata.write(td_data_fix+','+' '+'\n'+' ')
+
+driver.get (URLBAT)
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight);var lenOfPage=document.body.scrollHieght;return lenOfPage;")
+time.sleep(2)
+ddata.write("\n"+'\n')
+
+allTables = driver.find_elements_by_class_name('Table2__tbody')
+
+for table in allTables:
+    for row in table.find_elements_by_xpath('//*[@id="players_standard_batting"'):
+        tds = row.find_elements_by_tag_name('td')
+        td_data = str([td.text for td in tds])
+        td_data_strip = unidecode(td_data.rstrip('\n'))
+        td_data_strip2 = td_data_strip.replace("'", "")
+        td_data_strip3 = td_data_strip2.replace("[", "")
+        td_data_fix = td_data_strip3.replace("]", "")
+        if "[]" not in td_data_fix:
+            ddata.write(td_data_fix+','+' '+'\n'+' ')
+ddata.close()
+print ("I'm done")
+driver.quit()
