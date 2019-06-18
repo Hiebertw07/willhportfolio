@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+import praw
+import json
+import datetime
+import re
+from unidecode import unidecode
+
+def replaceMultiple(mainString, toBeReplaces, newString):
+    for elem in toBeReplaces:
+        if elem in mainString:
+            mainString = mainString.replace(elem, newString)
+    return mainString
+
+reddit = praw.Reddit(client_id='$$$$$$$$$$$$$$$',
+                     client_secret='$$$$$$$$$$$$$$$$$',
+                     redirect_uri='http://localhost:8080',
+                     user_agent='testscript')
+subreddit = reddit.subreddit('FantasyFootball')
+top_subreddit = subreddit.hot()
+Jdata = open('public_html/ticker/reddit.php', 'w')
+Jdata.write("<style>  a:link {color:white; text-decoration:none;} a:visited {color:white;} a:hover{color:#bdbdaf;} body{color:rgba(189,189,175,0.5); font-family: 'Raleway', sans-serif;} #search_para {font-size:105%; padding-bottom:0vh;}"+"\n"+"::-webkit-scrollbar {width: 2vw;}"+"\n")
+Jdata.write("::-webkit-scrollbar-trackpiece {background-color:rgba(0,0,0,0);}"+"\n"+"::-webkit-scrollbar-button {background-color:rgba(75,75,75,0.7);}"+"\n"+"::-webkit-scrollbar-thumb {background-color:rgba(168,168,168,0.7); border-radius: 10px; -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);}"+"\n") 
+Jdata.write("::-webkit-scrollbar-thumb:hover {background-color:rgba(168,168,168,0.9);}"+"\n"+"ul {list-style-type:none;} ul li {list-style-type:none; padding:0vh;}</style>"+"\n"+"<div class=feedtable height=70vh><ul>")
+
+
+
+for submission in subreddit.hot(limit=20):
+    JstrS = submission.title[:120] + "..." if len(submission.title) > 120 else submission.title
+    Jstra = unidecode(JstrS)
+    Jstrb = Jstra.translate(str.maketrans({'"':None}))
+    Jstring = json.dumps(Jstrb)
+    JstrURL = json.dumps(submission.url)
+    Tdate = datetime.datetime.now()
+    Pdate = datetime.datetime.fromtimestamp(submission.created_utc)
+    Tdelta = Tdate - Pdate
+    Jdate = str(Tdelta)[:4]
+    Jvotes = submission.upvote_ratio * 100
+    if "'Official" not in submission.title:
+        if "OFFICIAL" not in submission.title:
+            if "Official:" not in submission.title:
+                if "OFFICIAL:" not in submission.title:
+                    if "Challenge" not in submission.title:
+                        if "FantasyMod" not in str(submission.author):
+                            Jdata.write('<li><span id="search_para"><a target='+"blank"+" href="+JstrURL+">"+Jstring+"</a></span>"+"<br /><ul><li>"+ str(Jdate)+" ago"+ " - "+str("%.0f" % Jvotes)+" % <img src='/imgs/upvote.png'>"+"</li></ul><br /></li>"+"\n")
+Jdata.write("</ul></div>")
+Jdata.close()
